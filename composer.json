@@ -1,7 +1,7 @@
 {
   "name": "jokumer/privacy",
   "type": "typo3-cms-extension",
-  "description": "Manage compliance rules for TYPO3 to improve privacy and to grant the EU General Data Protection Regulation (GPDR)",
+  "description": "Manage compliance rules for TYPO3 to improve privacy and to grant the EU General Data Protection Regulation (GDPR)",
   "keywords": [
     "TYPO3",
     "extension"

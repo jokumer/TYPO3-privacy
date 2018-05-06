@@ -1,7 +1,7 @@
 <?php
 $EM_CONF[$_EXTKEY] = [
     'title' => 'Privacy manager',
-    'description' => 'Manage compliance rules for TYPO3 to improve privacy and to grant the EU General Data Protection Regulation (GPDR)',
+    'description' => 'Manage compliance rules for TYPO3 to improve privacy and to grant the EU General Data Protection Regulation (GDPR)',
     'category' => 'module',
     'author' => 'JKummer, prathers',
     'author_email' => 'service@enobe.de',
