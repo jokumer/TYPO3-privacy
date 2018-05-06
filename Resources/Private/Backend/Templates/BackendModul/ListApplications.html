@@ -1,0 +1,66 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<f:layout name="BackendModul" />
+<f:section name="MainContent">
+	<h1>
+		<f:translate key="module.header.applications"/>
+	</h1>
+	<f:if condition="{applications}">
+		<f:then>
+			<div class="panel panel-space panel-default recordlist">
+				<div class="panel-heading">
+					<span><f:translate key="module.applications" /></span>
+				</div>
+				<div class="collapse in">
+					<div class="table-fit">
+						<table id="forms" class="table table-striped table-hover">
+							<thead>
+							<tr>
+								<th class="col-icon nowrap">&nbsp;</th>
+								<th class="col-title col-responsive nowrap">
+									<f:translate key="module.application" />
+								</th>
+								<th class="col-control nowrap"></th>
+								<th class="nowrap">
+									<f:translate key="module.application.subjectsTotal" />
+								</th>
+							</tr>
+							</thead>
+							<tbody>
+							<f:for each="{applications}" as="application">
+								<tr>
+									<td class="col-icon nowrap">
+										<span title="{application.table}" data-toggle="tooltip" data-placement="top">
+											<core:icon identifier="{application.icon}" />
+										</span>
+									</td>
+									<td class="col-title col-responsive nowrap">
+										<f:link.action action="listSubjects"
+													   arguments="{applicationKey: application.key}"
+													   title="{f:translate(key: 'module.application.edit')}">
+											{application.label}
+										</f:link.action>
+									</td>
+									<td class="col-control nowrap">
+										<f:link.action action="listSubjects"
+													   arguments="{applicationKey: application.key}"
+													   class="btn btn-default"
+													   title="{f:translate(key: 'module.application.edit')}">
+											<core:icon identifier="actions-open" />
+										</f:link.action>
+									</td>
+									<td class="col-responsive nowrap">
+										{application.subjectsTotal}
+									</td>
+								</tr>
+							</f:for>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</f:then>
+		<f:else>
+			<f:be.infobox title="{f:translate(key: 'module.applications.empty')}" state="-1" />
+		</f:else>
+	</f:if>
+</f:section>

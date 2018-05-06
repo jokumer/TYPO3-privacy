@@ -1,0 +1,32 @@
+{
+  "name": "jokumer/privacy",
+  "type": "typo3-cms-extension",
+  "description": "Manage compliance rules for TYPO3 to improve privacy and to grant the EU General Data Protection Regulation (GPDR)",
+  "keywords": [
+    "TYPO3",
+    "extension"
+  ],
+  "authors": [
+    {
+      "name": "Joerg Kummer",
+      "role": "Developer"
+    },
+    {
+      "name": "Preben Rather Soerensen"
+    }
+  ],
+  "license": "GPL-3.0",
+  "require": {
+    "typo3/cms-backend": ">=8.7 <8.8",
+    "typo3/cms-core": ">=8.7 <8.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "Jokumer\\Privacy\\": "Classes"
+    }
+  },
+  "replace": {
+    "privacy": "self.version",
+    "typo3-ter/privacy": "self.version"
+  }
+}

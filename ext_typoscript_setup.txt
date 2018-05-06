@@ -1,0 +1,7 @@
+module.tx_privacy {
+    view {
+        templateRootPaths.10 = EXT:privacy/Resources/Private/Backend/Templates/
+        partialRootPaths.10 = EXT:privacy/Resources/Private/Backend/Partials/
+        layoutRootPaths.10 = EXT:privacy/Resources/Private/Backend/Layouts/
+    }
+}

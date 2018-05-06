@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0" xmlns:t3="http://typo3.org/schemas/xliff">
+	<file t3:id="1525301100" source-language="en" datatype="plaintext" original="messages" date="2018-05-03T00:45:00Z" product-name="privacy">
+		<header/>
+		<body>
+			<trans-unit id="module.header.applications">
+				<source>Privacy applications</source>
+			</trans-unit>
+			<trans-unit id="module.header.application">
+				<source>Privacy application</source>
+			</trans-unit>
+			<trans-unit id="module.shortcut.name" xml:space="preserve">
+				<source>Privacy manager</source>
+			</trans-unit>
+			<trans-unit id="module.application" xml:space="preserve">
+				<source>Application</source>
+			</trans-unit>
+			<trans-unit id="module.application.subjectsTotal" xml:space="preserve">
+				<source>Subjects</source>
+			</trans-unit>
+			<trans-unit id="module.application.edit" xml:space="preserve">
+				<source>Edit this application</source>
+			</trans-unit>
+			<trans-unit id="module.applications" xml:space="preserve">
+				<source>Applications</source>
+			</trans-unit>
+			<trans-unit id="module.applications.empty" xml:space="preserve">
+				<source>No applications</source>
+			</trans-unit>
+			<trans-unit id="module.subject" xml:space="preserve">
+				<source>Subject</source>
+			</trans-unit>
+			<trans-unit id="module.subject.anonymize" xml:space="preserve">
+				<source>Anonymize this subject</source>
+			</trans-unit>
+			<trans-unit id="module.subject.anonymize.confirm" xml:space="preserve">
+				<source>You really want to anonymize this subject?</source>
+			</trans-unit>
+			<trans-unit id="module.subject.delete" xml:space="preserve">
+				<source>Delete this subject</source>
+			</trans-unit>
+			<trans-unit id="module.subject.delete.confirm" xml:space="preserve">
+				<source>You really want to delete this subject?</source>
+			</trans-unit>
+			<trans-unit id="module.subject.edit" xml:space="preserve">
+				<source>Edit this subject</source>
+			</trans-unit>
+			<trans-unit id="module.subject.export" xml:space="preserve">
+				<source>Export this subject</source>
+			</trans-unit>
+			<trans-unit id="module.subjects" xml:space="preserve">
+				<source>Subjects</source>
+			</trans-unit>
+			<trans-unit id="module.subjects.empty" xml:space="preserve">
+				<source>No subjects</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
