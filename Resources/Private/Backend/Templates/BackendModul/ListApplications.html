@@ -2,7 +2,7 @@
 <f:layout name="BackendModul" />
 <f:section name="MainContent">
 	<h1>
-		<f:translate key="module.header.applications"/>
+		<f:translate key="module.header.applications" />
 	</h1>
 	<f:if condition="{applications}">
 		<f:then>
@@ -12,7 +12,7 @@
 				</div>
 				<div class="collapse in">
 					<div class="table-fit">
-						<table id="forms" class="table table-striped table-hover">
+						<table class="table table-striped table-hover">
 							<thead>
 							<tr>
 								<th class="col-icon nowrap">&nbsp;</th>
@@ -60,7 +60,9 @@
 			</div>
 		</f:then>
 		<f:else>
-			<f:be.infobox title="{f:translate(key: 'module.applications.empty')}" state="-1" />
+			<f:be.infobox title="{f:translate(key: 'module.applications.empty')}" state="-1" >
+				<f:translate key="module.applications.empty.help" />
+			</f:be.infobox>
 		</f:else>
 	</f:if>
 </f:section>

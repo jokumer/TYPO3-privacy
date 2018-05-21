@@ -121,4 +121,21 @@ class SubjectRepository
                 ->update($table, $updateFields, ['uid' => (int)$uid]);
         }
     }
+
+    /**
+     * Delete a single subject for an application by table and uid
+     *
+     * @param string $table
+     * @param int $uid
+     * @return void
+     */
+    public function deleteSubject($table = null, $uid = null)
+    {
+        if ($table !== null && $uid !== null) {
+            /** @var ConnectionPool $queryBuilder */
+            GeneralUtility::makeInstance(ConnectionPool::class)
+                ->getConnectionForTable($table)
+                ->delete($table, ['uid' => (int)$uid]);
+        }
+    }
 }

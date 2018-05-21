@@ -2,16 +2,15 @@
 namespace Jokumer\Privacy\Domain\Repository;
 
 use Jokumer\Privacy\Domain\Model\Application;
-use Jokumer\Privacy\Domain\Repository\SubjectRepository;
-use TYPO3\CMS\Core\Configuration\ConfigurationManager;
-use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManager;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 
 /**
  * Class ApplicationRepository
  * Provides methods to fetch applications which contains data subjects with privacy requirements.
- * Applications are configured in $GLOBALS[TYPO3_CONF_VARS][EXTCONF][privacy][applications]
+ * Applications are configured in typoscript module.tx_privacy.settings.applications
  *
  * @package TYPO3
  * @subpackage tx_privacy
@@ -21,14 +20,6 @@ use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
  */
 class ApplicationRepository
 {
-
-    /**
-     * Configuration path
-     *
-     * @var string
-     */
-    protected $configurationPath = 'EXTCONF/privacy';
-
     /**
      * Configured applications
      *
@@ -58,14 +49,11 @@ class ApplicationRepository
      */
     public function __construct()
     {
-        if (isset($GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['privacy']['applications'])) {
-            $this->configuredApplications = $GLOBALS['TYPO3_CONF_VARS']['EXTCONF']['privacy']['applications'];
-        } else {
-            $configurationManager = GeneralUtility::makeInstance(ConfigurationManager::class);
-            $configurationManager->setLocalConfigurationValueByPath(
-                $this->configurationPath,
-                ['applications' => []]
-            );
+        /** @var ConfigurationManager $configurationManager */
+        $configurationManager = GeneralUtility::makeInstance(ConfigurationManager::class);
+        $configuration = $configurationManager->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_SETTINGS, 'privacy');
+        if (isset($configuration['applications'])) {
+            $this->configuredApplications = $configuration['applications'];
         }
     }
 

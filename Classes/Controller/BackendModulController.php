@@ -9,7 +9,9 @@ use TYPO3\CMS\Backend\Template\ModuleTemplate;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
+use TYPO3\CMS\Core\Imaging\Icon;
 use TYPO3\CMS\Core\Utility\CsvUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
 use TYPO3\CMS\Lang\LanguageService;
@@ -83,7 +85,7 @@ class BackendModulController extends ActionController
         /** @var BackendTemplateView $view */
         parent::initializeView($view);
         $this->registerDocHeaderButtons();
-        $this->view->assign('returnUrl', rawurlencode(\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('REQUEST_URI')));
+        $this->view->assign('returnUrl', rawurlencode(GeneralUtility::getIndpEnv('REQUEST_URI')));
     }
 
     /**
@@ -136,11 +138,44 @@ class BackendModulController extends ActionController
         }
         // Update subject for fields to anonymize
         if (!empty($subject) && !empty($fieldsToAnonymize)) {
-            foreach ($fieldsToAnonymize as $fieldToAnonymize) {
-                $updateFields[$fieldToAnonymize] = 0; // @todo: do real anonymization depend on DB field properties
+            foreach ($fieldsToAnonymize as $fieldToAnonymizeKey => $fieldToAnonymizeValue) {
+                $updateFields[$fieldToAnonymizeKey] = 0; // @todo: do real anonymization depend on DB field properties
             }
             $this->subjectRepository->updateSubject($application->getTable(), $subject['uid'], $updateFields);
-            $this->redirect('listSubjects', null, null, ['applicationKey' => $application->getKey()]);
+            $this->addFlashMessage('Subject anonymized!');
+            if ($this->request->hasArgument('returnUrl')) {
+                header('Location: ' . GeneralUtility::sanitizeLocalUrl(rawurldecode($this->request->getArgument('returnUrl'))));
+            } else {
+                $this->redirect('listSubjects', null, null, ['applicationKey' => $application->getKey()]);
+            }
+        }
+    }
+
+    /**
+     * Delete subject
+     * Needs applicationKey and subjectUid as request parameters
+     */
+    public function deleteSubjectAction() {
+        // Get application
+        $application = null;
+        if ($this->request->hasArgument('applicationKey')) {
+            /** @var Application $application */
+            $application = $this->applicationRepository->getApplication($this->request->getArgument('applicationKey'));
+        }
+        // Get subject
+        $subject = null;
+        if ($application instanceof Application && $this->request->hasArgument('subjectUid')) {
+            $subject = $this->subjectRepository->getSubject((string)$application->getTable(), (int)$this->request->getArgument('subjectUid'));
+        }
+        // Delete subject
+        if (!empty($subject)) {
+            $this->subjectRepository->deleteSubject($application->getTable(), $subject['uid']);
+            $this->addFlashMessage('Subject deleted!');
+            if ($this->request->hasArgument('returnUrl')) {
+                header('Location: ' . GeneralUtility::sanitizeLocalUrl(rawurldecode($this->request->getArgument('returnUrl'))));
+            } else {
+                $this->redirect('listSubjects', null, null, ['applicationKey' => $application->getKey()]);
+            }
         }
     }
 
@@ -171,9 +206,9 @@ class BackendModulController extends ActionController
             $csvData = [];
             $exportKeys = [];
             $exportValues = [];
-            foreach ($fieldsToExport as $fieldToExport) {
-                $exportKeys[$fieldToExport] = $fieldToExport; // @todo: use LLL labels for field keys
-                $exportValues[$fieldToExport] = isset($subject[$fieldToExport]) ? $subject[$fieldToExport] : ''; 
+            foreach ($fieldsToExport as $fieldToExportKey => $fieldToExportValue) {
+                $exportKeys[$fieldToExportKey] = $fieldToExportKey; // @todo: use LLL labels for field keys
+                $exportValues[$fieldToExportKey] = isset($subject[$fieldToExportKey]) ? $subject[$fieldToExportKey] : ''; 
             }
             $delim = ','; // @todo: configurable delimeter
             $quote = '"'; // @todo: configurable quote
@@ -188,7 +223,48 @@ class BackendModulController extends ActionController
             die;
         } else {
             // @todo: error handling
-            $this->redirect('listSubjects', null, null, ['applicationKey' => $application->getKey()]);
+            if ($this->request->hasArgument('returnUrl')) {
+                header('Location: ' . GeneralUtility::sanitizeLocalUrl(rawurldecode($this->request->getArgument('returnUrl'))));
+            } else {
+                $this->redirect('listSubjects', null, null, ['applicationKey' => $application->getKey()]);
+            }
+        }
+    }
+
+    /**
+     * View subject
+     * Needs applicationKey and subjectUid as request parameters
+     */
+    public function viewSubjectAction() {
+        // Get application
+        $application = null;
+        if ($this->request->hasArgument('applicationKey')) {
+            /** @var Application $application */
+            $application = $this->applicationRepository->getApplication($this->request->getArgument('applicationKey'));
+        }
+        // Get subject
+        $subject = null;
+        if ($application instanceof Application && $this->request->hasArgument('subjectUid')) {
+            $subject = $this->subjectRepository->getSubject((string)$application->getTable(), (int)$this->request->getArgument('subjectUid'));
+        }
+        // Get subject for fields to view
+        if (!empty($subject)) {
+            $tableName = $application->getTable();
+            $subjectEntries = [];
+            foreach ($subject as $entryKey => $entryValue) {
+                $label = $this->getLanguageService()->sL($GLOBALS['TCA'][$tableName]['columns'][$entryKey]['label']);
+                if ($label) {
+                    $subjectEntryLabel = rtrim($label, ':'); // Remove colon at the end of default labels
+                } else  {
+                    $subjectEntryLabel = $entryKey; // Use db field name, if no lable exists
+                }
+                $subjectEntries[$subjectEntryLabel] = $entryValue;
+            }
+            $this->view->assign('application', $application);
+            $this->view->assign('subject', $subjectEntries);
+            $this->view->assign('tceDbModuleUrl', BackendUtility::getModuleUrl('tce_db'));
+        } else {
+            // @todo: error handling
         }
     }
 
@@ -202,8 +278,30 @@ class BackendModulController extends ActionController
         if ($this->view->getModuleTemplate() instanceof ModuleTemplate) {
             /** @var ButtonBar $buttonBar */
             $buttonBar = $this->view->getModuleTemplate()->getDocHeaderComponent()->getButtonBar();
+            // Add back button
+            $this->addDocHeaderButtonBack($buttonBar);
             // Add shortcut button
             $this->addDocHeaderButtonShortcut($buttonBar);
+        }
+    }
+
+    /**
+     * Add docheader button for back
+     * Exclude default action listApplication
+     * 
+     * @param ButtonBar $buttonBar
+     */
+    protected function addDocHeaderButtonBack(ButtonBar $buttonBar)
+    {
+        if ($this->request->getControllerActionName() !== 'listApplications') {
+            $uri = GeneralUtility::getIndpEnv('HTTP_REFERER');
+            $title = $this->getLanguageService()->sL('LLL:EXT:privacy/Resources/Private/Language/locallang.xlf:module.button.shortcut');
+            $icon = $this->view->getModuleTemplate()->getIconFactory()->getIcon('actions-view-go-back', Icon::SIZE_SMALL);
+            $backButton = $buttonBar->makeLinkButton()
+                ->setHref($uri)
+                ->setTitle($title)
+                ->setIcon($icon);
+            $buttonBar->addButton($backButton, ButtonBar::BUTTON_POSITION_LEFT);
         }
     }
 

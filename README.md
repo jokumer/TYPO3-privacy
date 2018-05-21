@@ -5,7 +5,7 @@
 
 Manage compliance rules for TYPO3 to improve privacy and to grant the EU General Data Protection Regulation (GDPR)
 
-## Annoncement ##
+## Announcement ##
 
 This extension is still on an early state - Work in Progress, so to say. We would like to invite any developer or GDPR experts to contribute to the future developing of the extension. The main goal is to get an extension up running, that will help website owners in the TYPO3 world to be GDPR compliant. Yes, there are many issues involved, and the extension will not fix everyone of them. Focus is on the most important issues, connected to the TYPO3 system.
 

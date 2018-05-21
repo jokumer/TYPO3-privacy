@@ -3,15 +3,6 @@
 	<file t3:id="1525301100" source-language="en" datatype="plaintext" original="messages" date="2018-05-03T00:45:00Z" product-name="privacy">
 		<header/>
 		<body>
-			<trans-unit id="module.header.applications">
-				<source>Privacy applications</source>
-			</trans-unit>
-			<trans-unit id="module.header.application">
-				<source>Privacy application</source>
-			</trans-unit>
-			<trans-unit id="module.shortcut.name" xml:space="preserve">
-				<source>Privacy manager</source>
-			</trans-unit>
 			<trans-unit id="module.application" xml:space="preserve">
 				<source>Application</source>
 			</trans-unit>
@@ -26,6 +17,24 @@
 			</trans-unit>
 			<trans-unit id="module.applications.empty" xml:space="preserve">
 				<source>No applications</source>
+			</trans-unit>
+			<trans-unit id="module.applications.empty.help" xml:space="preserve">
+				<source>Applications are configured in typoscript module.tx_privacy.settings.applications</source>
+			</trans-unit>
+			<trans-unit id="module.button.shortcut" xml:space="preserve">
+				<source>Create Shortcut</source>
+			</trans-unit>
+			<trans-unit id="module.button.back" xml:space="preserve">
+				<source>Go Back</source>
+			</trans-unit>
+			<trans-unit id="module.header.applications">
+				<source>Privacy applications</source>
+			</trans-unit>
+			<trans-unit id="module.header.application">
+				<source>Privacy application</source>
+			</trans-unit>
+			<trans-unit id="module.header.subject">
+				<source>Privacy subject</source>
 			</trans-unit>
 			<trans-unit id="module.subject" xml:space="preserve">
 				<source>Subject</source>
@@ -45,8 +54,20 @@
 			<trans-unit id="module.subject.edit" xml:space="preserve">
 				<source>Edit this subject</source>
 			</trans-unit>
+			<trans-unit id="module.subject.empty" xml:space="preserve">
+				<source>No subject</source>
+			</trans-unit>
 			<trans-unit id="module.subject.export" xml:space="preserve">
 				<source>Export this subject</source>
+			</trans-unit>
+			<trans-unit id="module.subject.view" xml:space="preserve">
+				<source>Show this subject</source>
+			</trans-unit>
+			<trans-unit id="module.subject.view.field.key" xml:space="preserve">
+				<source>Field</source>
+			</trans-unit>
+			<trans-unit id="module.subject.view.field.value" xml:space="preserve">
+				<source>Value</source>
 			</trans-unit>
 			<trans-unit id="module.subjects" xml:space="preserve">
 				<source>Subjects</source>

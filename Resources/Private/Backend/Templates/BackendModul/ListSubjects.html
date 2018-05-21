@@ -6,7 +6,7 @@
 <f:layout name="BackendModul" />
 <f:section name="MainContent">
 	<h1>
-		<f:translate key="module.header.application"/> "{application.label}"
+		<f:translate key="module.header.application" /> "{application.label}"
 	</h1>
 	<f:if condition="{subjects}">
 		<f:then>
@@ -16,7 +16,7 @@
 				</div>
 				<div class="collapse in">
 					<div class="table-fit">
-						<table id="forms" class="table table-striped table-hover">
+						<table class="table table-striped table-hover">
 							<thead>
 							<tr>
 								<th class="col-icon nowrap">&nbsp;</th>
@@ -43,30 +43,39 @@
 										</a>
 									</td>
 									<td class="col-control nowrap">
-										<a class="btn btn-default"
-										   href="{b:editRecord(parameters: 'edit[{application.table}][{subject.uid}]=edit&returnUrl={returnUrl}')}"
-										   title="{f:translate(key: 'module.subject.edit')}">
-											<core:icon identifier="actions-open" />
-										</a>
-										<f:link.action action="exportSubject"
-													   arguments="{applicationKey: application.key, subjectUid: subject.uid}"
-													   class="btn btn-default"
-													   title="{f:translate(key: 'module.subject.export')}">
-											<core:icon identifier="actions-download" />
-										</f:link.action>
-										<f:link.action action="anonymizeSubject"
-													   arguments="{applicationKey: application.key, subjectUid: subject.uid}"
-													   class="btn btn-default"
-													   onclick="javascript:return confirm('{f:translate(key: 'module.subject.delete.confirm')}')"
-													   title="{f:translate(key: 'module.subject.anonymize')}">
-											<core:icon identifier="actions-synchronize" />
-										</f:link.action>
-										<a class="btn btn-default"
-										   href="{tceDbModuleUrl}&cmd[{application.table}][{subject.uid}][delete]=1&prErr=1&uPT=1&redirect={returnUrl}"
-										   onclick="javascript:return confirm('{f:translate(key: 'module.subject.delete.confirm')}')"
-										   title="{f:translate(key: 'module.subject.delete')}">
-											<core:icon identifier="actions-delete" />
-										</a>
+										<div class="btn-group">
+											<a class="btn btn-default"
+											   href="{b:editRecord(parameters: 'edit[{application.table}][{subject.uid}]=edit&returnUrl={returnUrl}')}"
+											   title="{f:translate(key: 'module.subject.edit')}">
+												<core:icon identifier="actions-open" />
+											</a>
+											<f:link.action action="viewSubject"
+														   arguments="{applicationKey: application.key, subjectUid: subject.uid, returnUrl: returnUrl}"
+														   class="btn btn-default"
+														   title="{f:translate(key: 'module.subject.view')}">
+												<core:icon identifier="actions-document-info" />
+											</f:link.action>
+											<f:link.action action="exportSubject"
+														   arguments="{applicationKey: application.key, subjectUid: subject.uid, returnUrl: returnUrl}"
+														   class="btn btn-default"
+														   title="{f:translate(key: 'module.subject.export')}">
+												<core:icon identifier="actions-download" />
+											</f:link.action>
+											<f:link.action action="anonymizeSubject"
+														   arguments="{applicationKey: application.key, subjectUid: subject.uid, returnUrl: returnUrl}"
+														   class="btn btn-default"
+														   onclick="javascript:return confirm('{f:translate(key: 'module.subject.anonymize.confirm')}')"
+														   title="{f:translate(key: 'module.subject.anonymize')}">
+												<core:icon identifier="actions-synchronize" />
+											</f:link.action>
+											<f:link.action action="deleteSubject"
+														   arguments="{applicationKey: application.key, subjectUid: subject.uid, returnUrl: returnUrl}"
+														   class="btn btn-default"
+														   onclick="javascript:return confirm('{f:translate(key: 'module.subject.delete.confirm')}')"
+														   title="{f:translate(key: 'module.subject.delete')}">
+												<core:icon identifier="actions-delete" />
+											</f:link.action>
+										</div>
 									</td>
 									<td class="nowrap">
 										<f:if condition="{subject.crdate}">
