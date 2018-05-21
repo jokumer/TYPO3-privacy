@@ -1,10 +1,13 @@
 {
   "name": "jokumer/privacy",
   "type": "typo3-cms-extension",
-  "description": "Manage compliance rules for TYPO3 to improve privacy and to grant the EU General Data Protection Regulation (GPDR)",
+  "description": "Manage compliance rules for TYPO3 to improve privacy and to grant the EU General Data Protection Regulation (GDPR)",
+  "license": "GPL-3.0+",
   "keywords": [
     "TYPO3",
-    "extension"
+    "extension",
+    "privacy",
+    "gdpr"
   ],
   "authors": [
     {
@@ -15,7 +18,10 @@
       "name": "Preben Rather Soerensen"
     }
   ],
-  "license": "GPL-3.0",
+  "support": {
+    "email": "service@enobe.de",
+    "source": "https://github.com/jokumer/TYPO3-privacy"
+  },
   "require": {
     "typo3/cms-backend": ">=8.7 <8.8",
     "typo3/cms-core": ">=8.7 <8.8"
@@ -28,5 +34,15 @@
   "replace": {
     "privacy": "self.version",
     "typo3-ter/privacy": "self.version"
+  },
+  "config": {
+    "vendor-dir": ".Build/vendor",
+    "bin-dir": ".Build/bin"
+  },
+  "extra": {
+    "typo3/cms": {
+      "cms-package-dir": "{$vendor-dir}/typo3/cms",
+      "web-dir": ".Build/Web"
+    }
   }
 }

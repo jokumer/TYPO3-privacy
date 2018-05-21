@@ -9,7 +9,7 @@ if (TYPO3_MODE === 'BE') {
         'privacy',
         'bottom',
         [
-            'BackendModul' => 'listApplications, listSubjects, anonymizeSubject, exportSubject',
+            'BackendModul' => 'listApplications, listSubjects, anonymizeSubject, exportSubject, deleteSubject, viewSubject',
         ],
         [
             'access' => 'user,group',

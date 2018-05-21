@@ -18,7 +18,7 @@ class Application
 {
     /**
      * Key
-     * Identifies entries from $GLOBALS[TYPO3_CONF_VARS][EXTCONF][privacy][applications]
+     * Identifies entries from typoscript module.tx_privacy.settings.applications
      *
      * @var string
      */
@@ -26,7 +26,7 @@ class Application
 
     /**
      * Fields to anonymize
-     * Contains field names from $GLOBALS[TYPO3_CONF_VARS][EXTCONF][privacy][applications][*][fieldProcessing][anonymize]
+     * Contains field names from typoscript module.tx_privacy.settings.applications.[APPLICATIONNAME].fieldProcessing.anonymize
      *
      * @var array
      */
@@ -34,7 +34,7 @@ class Application
 
     /**
      * Fields to export
-     * Contains field names from $GLOBALS[TYPO3_CONF_VARS][EXTCONF][privacy][applications][*][fieldProcessing][export]
+     * Contains field names from typoscript module.tx_privacy.settings.applications.[APPLICATIONNAME].fieldProcessing.export
      *
      * @var array
      */
