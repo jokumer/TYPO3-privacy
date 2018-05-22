@@ -84,6 +84,7 @@ class ApplicationRepository
         $application = null;
         if ($applicationKey !== null && isset($this->configuredApplications[$applicationKey])) {
             $applicationConfiguration = $this->configuredApplications[$applicationKey];
+            /** @var Application $application */
             $application = $this->objectManager->get(Application::class);
             // Set properties
             $application->setKey($applicationKey);

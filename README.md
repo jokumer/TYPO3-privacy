@@ -3,7 +3,7 @@
 [![Total Downloads](https://poser.pugx.org/jokumer/privacy/downloads.svg)](https://packagist.org/packages/jokumer/privacy)
 [![License](https://poser.pugx.org/jokumer/privacy/license.svg)](https://packagist.org/packages/jokumer/privacy)
 
-Manage compliance rules for TYPO3 to improve privacy and to grant the EU General Data Protection Regulation (GPDR)
+Manage compliance rules for TYPO3 to improve privacy and to grant the EU General Data Protection Regulation (GDPR)
 
 ## Announcement ##
 
