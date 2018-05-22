@@ -10,10 +10,12 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Backend\View\BackendTemplateView;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Imaging\Icon;
+use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\CsvUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Mvc\View\ViewInterface;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Lang\LanguageService;
 
 /**
@@ -127,9 +129,9 @@ class BackendModulController extends ActionController
             $application = $this->applicationRepository->getApplication($this->request->getArgument('applicationKey'));
         }
         // Get fields to anonymize
-        $fieldsToAnonymize = null;
+        $fieldConfiguration = null;
         if ($application instanceof Application) {
-            $fieldsToAnonymize = $application->getFieldsToAnonymize();
+            $fieldConfiguration = $application->getFieldsToAnonymize();
         }
         // Get subject
         $subject = null;
@@ -137,9 +139,9 @@ class BackendModulController extends ActionController
             $subject = $this->subjectRepository->getSubject((string)$application->getTable(), (int)$this->request->getArgument('subjectUid'));
         }
         // Update subject for fields to anonymize
-        if (!empty($subject) && !empty($fieldsToAnonymize)) {
-            foreach ($fieldsToAnonymize as $fieldToAnonymizeKey => $fieldToAnonymizeValue) {
-                $updateFields[$fieldToAnonymizeKey] = 0; // @todo: do real anonymization depend on DB field properties
+        if (!empty($subject) && !empty($fieldConfiguration)) {
+            foreach ($fieldConfiguration as $fieldKey => $fieldValue) {
+                $updateFields[$fieldKey] = 0; // @todo: do real anonymization depend on DB field properties
             }
             $this->subjectRepository->updateSubject($application->getTable(), $subject['uid'], $updateFields);
             $this->addFlashMessage('Subject anonymized!');
@@ -191,9 +193,9 @@ class BackendModulController extends ActionController
             $application = $this->applicationRepository->getApplication($this->request->getArgument('applicationKey'));
         }
         // Get fields to export
-        $fieldsToExport = null;
+        $fieldConfiguration = null;
         if ($application instanceof Application) {
-            $fieldsToExport = $application->getFieldsToExport();
+            $fieldConfiguration = $application->getFieldsToExport();
         }
         // Get subject
         $subject = null;
@@ -201,26 +203,25 @@ class BackendModulController extends ActionController
             $subject = $this->subjectRepository->getSubject((string)$application->getTable(), (int)$this->request->getArgument('subjectUid'));
         }
         // Get subject for fields to export
-        if (!empty($subject) && !empty($fieldsToExport)) {
-            // Get csv data
-            $csvData = [];
-            $exportKeys = [];
-            $exportValues = [];
-            foreach ($fieldsToExport as $fieldToExportKey => $fieldToExportValue) {
-                $exportKeys[$fieldToExportKey] = $fieldToExportKey; // @todo: use LLL labels for field keys
-                $exportValues[$fieldToExportKey] = isset($subject[$fieldToExportKey]) ? $subject[$fieldToExportKey] : ''; 
+        if (!empty($subject) && !empty($fieldConfiguration) && $application instanceof Application) {
+            $subjectEntries = $this->resolveSubjectByFieldConfiguration($subject, $fieldConfiguration, $application);
+            if (!empty($subjectEntries)) {
+                // Get csv data
+                $csvData = [];
+                $delim = ','; // @todo: configurable delimeter
+                $quote = '"'; // @todo: configurable quote
+                $csvData['keys'] = CsvUtility::csvValues(array_keys($subjectEntries), $delim, $quote); // @todo: compatibility TYPO3 < 8.7 GeneralUtility::csvValues()
+                $csvData['values'] = CsvUtility::csvValues(array_values($subjectEntries), $delim, $quote); // @todo: compatibility: TYPO3 < 8.7 GeneralUtility::csvValues()
+                // Provide download
+                $filename = 'TYPO3_' . $application->getKey() . '_' . $subject['uid'] . '_' . date('dmYHi') . '.csv'; // @todo: configurable filename
+                $mimeType = 'application/octet-stream';
+                header('Content-Type: ' . $mimeType);
+                header('Content-Disposition: attachment; filename=' . $filename);
+                echo implode(CRLF, $csvData);
+                die;
+            } else {
+                // @todo: error handling
             }
-            $delim = ','; // @todo: configurable delimeter
-            $quote = '"'; // @todo: configurable quote
-            $csvData['keys'] = CsvUtility::csvValues($exportKeys, $delim, $quote); // @todo: compatibility TYPO3 < 8.7 GeneralUtility::csvValues()
-            $csvData['values'] = CsvUtility::csvValues($exportValues, $delim, $quote); // @todo: compatibility: TYPO3 < 8.7 GeneralUtility::csvValues()
-            // Provide download
-            $filename = 'TYPO3_' . $application->getKey() . '_' . $subject['uid'] . '_' . date('dmYHi') . '.csv'; // @todo: configurable filename
-            $mimeType = 'application/octet-stream';
-            header('Content-Type: ' . $mimeType);
-            header('Content-Disposition: attachment; filename=' . $filename);
-            echo implode(CRLF, $csvData);
-            die;
         } else {
             // @todo: error handling
             if ($this->request->hasArgument('returnUrl')) {
@@ -242,30 +243,99 @@ class BackendModulController extends ActionController
             /** @var Application $application */
             $application = $this->applicationRepository->getApplication($this->request->getArgument('applicationKey'));
         }
+        // Get fields to view
+        $fieldConfiguration = null;
+        if ($application instanceof Application) {
+            $fieldConfiguration = $application->getFieldsToExport();
+        }
         // Get subject
         $subject = null;
         if ($application instanceof Application && $this->request->hasArgument('subjectUid')) {
             $subject = $this->subjectRepository->getSubject((string)$application->getTable(), (int)$this->request->getArgument('subjectUid'));
         }
         // Get subject for fields to view
-        if (!empty($subject)) {
-            $tableName = $application->getTable();
-            $subjectEntries = [];
-            foreach ($subject as $entryKey => $entryValue) {
-                $label = $this->getLanguageService()->sL($GLOBALS['TCA'][$tableName]['columns'][$entryKey]['label']);
-                if ($label) {
-                    $subjectEntryLabel = rtrim($label, ':'); // Remove colon at the end of default labels
-                } else  {
-                    $subjectEntryLabel = $entryKey; // Use db field name, if no lable exists
-                }
-                $subjectEntries[$subjectEntryLabel] = $entryValue;
-            }
+        if (!empty($subject) && !empty($fieldConfiguration) && $application instanceof Application) {
+            $subjectEntries = $this->resolveSubjectByFieldConfiguration($subject, $fieldConfiguration, $application);
             $this->view->assign('application', $application);
             $this->view->assign('subject', $subjectEntries);
             $this->view->assign('tceDbModuleUrl', BackendUtility::getModuleUrl('tce_db'));
         } else {
             // @todo: error handling
         }
+    }
+
+    /**
+     * Resolve subject by field configuration
+     * Converts subject array with data from DB into labeled values as configured in TypoScript
+     * 
+     * @param array $subject
+     * @param array $fieldConfiguration TypoScript
+     * @param Application $application
+     * @return array|null $subjectEntries
+     */
+    protected function resolveSubjectByFieldConfiguration(array $subject, array $fieldConfiguration, Application $application) {
+        $subjectEntries = null;
+        if (!empty($subject) && !empty($fieldConfiguration)) {
+            /** @var TypoScriptService $typoScriptService */
+            $typoScriptService = GeneralUtility::makeInstance(TypoScriptService::class);
+            $configuration = $typoScriptService->convertPlainArrayToTypoScriptArray($fieldConfiguration);
+            $subjectEntries = [];
+            foreach ($configuration as $fieldKey => $fieldValue) {
+                // Ignore typoscript arrays - will be used in detail
+                if (strpos($fieldKey, '.') !== false) {
+                    continue;
+                }
+                // Check if value is enabled 'fieldName = 1'
+                if ($fieldValue) {
+                    // Get typoscript configuration
+                    if (isset($configuration[$fieldKey . '.'])) {
+                        // Get label
+                        if (isset($configuration[$fieldKey . '.']['label'])) {
+                            $label = $this->getLanguageService()->sL($configuration[$fieldKey . '.']['label']);
+                        } else {
+                            $label = $this->getLanguageService()->sL($GLOBALS['TCA'][$application->getTable()]['columns'][$fieldKey]['label']);
+                        }
+                        if ($label) {
+                            $subjectEntryLabel = rtrim($label, ':'); // Remove colon at the end of default labels
+                        } else  {
+                            $subjectEntryLabel = $fieldKey; // Use db field name, if no lable exists
+                        }
+                        // Get value
+                        $value = null;
+                        if (isset($configuration[$fieldKey . '.']['value'])) {
+                            $data = null;
+                            if ($subject[$fieldKey]) {
+                                $data = $subject[$fieldKey];
+                            }
+                            /** @var ContentObjectRenderer $cObj */
+                            $cObj = GeneralUtility::makeInstance(ContentObjectRenderer::class);
+                            $value = $cObj->stdWrap($data, $configuration[$fieldKey . '.']['value.']);
+                        } else {
+                            if ($subject[$fieldKey]) {
+                                $value = $subject[$fieldKey];
+                            }
+                        }
+                        $subjectEntries[$subjectEntryLabel] = $value;
+                        // Get default label and values from DB entry
+                    } else {
+                        // Get label
+                        $label = $this->getLanguageService()->sL($GLOBALS['TCA'][$application->getTable()]['columns'][$fieldKey]['label']);
+                        if ($label) {
+                            $subjectEntryLabel = rtrim($label, ':'); // Remove colon at the end of default labels
+                        } else  {
+                            $subjectEntryLabel = $fieldKey; // Use db field name, if no lable exists
+                        }
+                        // Get value
+                        $value = null;
+                        if ($subject[$fieldKey]) {
+                            $value = $subject[$fieldKey];
+                        }
+                        $subjectEntries[$subjectEntryLabel] = $value;
+                    }
+                }
+            }
+        }
+        return $subjectEntries;
     }
 
     /**
